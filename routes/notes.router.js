@@ -32,18 +32,17 @@ router.get('/notes', (req, res, next) => {
 router.get('/notes/:id', (req, res, next) => {
   const id = req.params.id;
 
-  knex('notes')
+  knex
     .select('id', 'title', 'content')
-    .where({id: id})
+    .from('notes')
+    .where({ id: id })
     .orderBy('notes.id')
     .then(results => {
-      if(results.length > 0) {
-        res.json(results[0]);
-      }else{
-        next();
-      }
+      res.json(results[0]);
     })
-    .catch(err => next(err));
+    .catch(err => {
+      next(err);
+    });
 });
 
 // Put update an item
