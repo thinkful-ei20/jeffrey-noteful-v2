@@ -65,14 +65,13 @@ router.put('/notes/:id', (req, res, next) => {
     err.status = 400;
     return next(err);
   }
-
-  notes.update(id, updateObj)
-    .then(item => {
-      if (item) {
-        res.json(item);
-      } else {
-        next();
-      }
+  
+  knex('notes')
+    .update(updateObj)
+    .where('id', id)
+    .returning(['id', 'title', 'content'])
+    .then(results => {
+      res.json(results[0]);
     })
     .catch(err => {
       next(err);
