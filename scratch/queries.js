@@ -35,10 +35,20 @@ const knex = require('../knex');
 //     console.error(err);
 //   });
 
-let updateNoteId = '1000';
+// let updateNoteId = '1000';
+// knex('notes')
+//   .where('id', updateNoteId)
+//   .update({ title: 'Update title', content: 'Update content' })
+//   .returning(['notes.id', 'title', 'content'])
+//   .then(results => {
+//     console.log(JSON.stringify(results[0], null, 2));
+//   })
+//   .catch(err => {
+//     console.error(err);
+//   });
+
 knex('notes')
-  .where('id', updateNoteId)
-  .update({ title: 'Update title', content: 'Update content' })
+  .insert({ title: 'New title', content: 'New content' })
   .returning(['notes.id', 'title', 'content'])
   .then(results => {
     console.log(JSON.stringify(results[0], null, 2));
@@ -46,3 +56,4 @@ knex('notes')
   .catch(err => {
     console.error(err);
   });
+  
