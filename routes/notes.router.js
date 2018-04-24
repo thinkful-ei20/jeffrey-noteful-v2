@@ -103,13 +103,13 @@ router.post('/notes', (req, res, next) => {
 router.delete('/notes/:id', (req, res, next) => {
   const id = req.params.id;
 
-  notes.delete(id)
+  knex.del()
+    .from('notes')
+    .where('id', req.params.id)
     .then(() => {
-      res.sendStatus(204);
+      res.status(204).end();
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 module.exports = router;
