@@ -19,15 +19,27 @@ const knex = require('../knex');
 //     console.error(err);
 //   });
 
-let noteId = '1009';
-knex
-  .select('notes.id', 'title', 'content')
-  .from('notes')
-  .modify(queryBuilder => {
-    if (noteId) {
-      queryBuilder.where('id', noteId);
-    }
-  })
+// let noteId = '1009';
+// knex
+//   .select('notes.id', 'title', 'content')
+//   .from('notes')
+//   .modify(queryBuilder => {
+//     if (noteId) {
+//       queryBuilder.where('id', noteId);
+//     }
+//   })
+//   .then(results => {
+//     console.log(JSON.stringify(results[0], null, 2));
+//   })
+//   .catch(err => {
+//     console.error(err);
+//   });
+
+let updateNoteId = '1000';
+knex('notes')
+  .where('id', updateNoteId)
+  .update({ title: 'Update title', content: 'Update content' })
+  .returning(['notes.id', 'title', 'content'])
   .then(results => {
     console.log(JSON.stringify(results[0], null, 2));
   })
