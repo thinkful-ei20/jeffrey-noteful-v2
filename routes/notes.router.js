@@ -65,7 +65,7 @@ router.put('/notes/:id', (req, res, next) => {
     err.status = 400;
     return next(err);
   }
-  
+
   knex('notes')
     .update(updateObj)
     .where('id', id)
@@ -90,15 +90,13 @@ router.post('/notes', (req, res, next) => {
     return next(err);
   }
 
-  notes.create(newItem)
-    .then(item => {
-      if (item) {
-        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
-      }
+  knex.insert(newItem)
+    .into('notes')
+    .returning(['id', 'title', 'content'])
+    .then((results) => {
+      res.location(`${req.originalUrl}/${results[0].id}`).status(201).json(results[0]);
     })
-    .catch(err => {
-      next(err);
-    });
+    .catch(err => next(err));
 });
 
 // Delete an item
