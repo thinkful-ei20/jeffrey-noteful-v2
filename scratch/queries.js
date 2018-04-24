@@ -1,6 +1,6 @@
-'use strict';
+// 'use strict';
 
-const knex = require('../knex');
+// const knex = require('../knex');
 
 // let searchTerm = 'gaga';
 // knex
@@ -57,9 +57,8 @@ const knex = require('../knex');
 //     console.error(err);
 //   });
 
-let deleteNoteId = '1011';
-knex('notes')
-  .where('id', deleteNoteId)
-  .del()
-  .then(console.log);
-  
+// let deleteNoteId = '1011';
+// knex('notes')
+//   .where('id', deleteNoteId)
+//   .del()
+//   .then(console.log);
