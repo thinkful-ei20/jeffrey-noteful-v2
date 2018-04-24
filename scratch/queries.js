@@ -47,13 +47,19 @@ const knex = require('../knex');
 //     console.error(err);
 //   });
 
+// knex('notes')
+//   .insert({ title: 'New title', content: 'New content' })
+//   .returning(['notes.id', 'title', 'content'])
+//   .then(results => {
+//     console.log(JSON.stringify(results[0], null, 2));
+//   })
+//   .catch(err => {
+//     console.error(err);
+//   });
+
+let deleteNoteId = '1011';
 knex('notes')
-  .insert({ title: 'New title', content: 'New content' })
-  .returning(['notes.id', 'title', 'content'])
-  .then(results => {
-    console.log(JSON.stringify(results[0], null, 2));
-  })
-  .catch(err => {
-    console.error(err);
-  });
+  .where('id', deleteNoteId)
+  .del()
+  .then(console.log);
   
