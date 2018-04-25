@@ -62,7 +62,7 @@ INSERT INTO notes (title, content, folder_id) VALUES
     null
   );
 
-  DROP TABLE IF EXISTS folders;
+  DROP TABLE IF EXISTS folders CASCADE;
 
   CREATE TABLE folders (
     id serial PRIMARY KEY,
