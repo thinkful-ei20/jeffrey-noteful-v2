@@ -33,4 +33,35 @@ router.get('/folders/:id', (req, res, next) => {
     });
 });
 
+router.put('/folders/:id', (req, res, next) => {
+  const folderId = req.params.id;
+
+  const { name } = req.body;
+
+  if (!name) {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  const updateItem = {
+    name: name
+  };
+
+  knex('folders')
+    .update(updateItem)
+    .where('id', folderId)
+    .returning(['id', 'name'])
+    .then(([result]) => {
+      if(result) {
+        res.json(result);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 module.exports = router;
