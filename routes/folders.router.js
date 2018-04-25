@@ -53,11 +53,33 @@ router.put('/folders/:id', (req, res, next) => {
     .where('id', folderId)
     .returning(['id', 'name'])
     .then(([result]) => {
-      if(result) {
+      if (result) {
         res.json(result);
       } else {
         next();
       }
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
+router.post('/folders', (req, res, next) => {
+  const { name } = req.body;
+
+  const newItem = { name };
+  if (!newItem.name) {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  knex
+    .insert(newItem)
+    .into('folders')
+    .returning(['id', 'name'])
+    .then(([result]) => {
+      res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
     })
     .catch(err => {
       next(err);
