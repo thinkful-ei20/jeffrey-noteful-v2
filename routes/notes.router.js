@@ -36,15 +36,16 @@ router.get('/notes', (req, res, next) => {
 
 // Get a single item
 router.get('/notes/:id', (req, res, next) => {
-  const id = req.params.id;
+  const noteId = req.params.id;
 
   knex
-    .select('id', 'title', 'content')
+    .select('notes.id', 'title', 'content', 'folders.id as folder_id', 'folders.name as folderName')
     .from('notes')
-    .where({ id: id })
+    .innerJoin('folders', 'notes.folder_id', 'folders.id')
+    .where({ 'notes.id': noteId })
     .orderBy('notes.id')
-    .then(results => {
-      res.json(results[0]);
+    .then(([result]) => {
+      res.json(result);
     })
     .catch(err => {
       next(err);
