@@ -28,7 +28,7 @@ app.use('/api', notesRouter);
 
 app.use('/api', foldersRouter);
 
-app.use('/api', notesRouter);
+app.use('/api', tagsRouter);
 
 // Catch-all 404
 app.use(function (req, res, next) {
