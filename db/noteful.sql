@@ -92,14 +92,14 @@ INSERT INTO notes (title, content, folder_id) VALUES
   ('#Personal'),
   ('#Work');
 
-  DROP TABLE IF EXISTS note_tags CASCADE;
+  DROP TABLE IF EXISTS notes_tags CASCADE;
 
-  CREATE TABLE note_tags (
+  CREATE TABLE notes_tags (
     note_id INTEGER NOT NULL REFERENCES notes ON DELETE CASCADE,
     tag_id INTEGER NOT NULL REFERENCES tags ON DELETE CASCADE
   );
 
-  INSERT INTO note_tags (note_id, tag_id) VALUES
+  INSERT INTO notes_tags (note_id, tag_id) VALUES
   (1000, 10),
   (1001, 11),
   (1002, 12),

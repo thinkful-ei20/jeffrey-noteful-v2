@@ -11,11 +11,11 @@ router.get('/notes', (req, res, next) => {
 
   knex('notes').select('notes.id', 'title', 'content',
     'folders.id as folderId', 'folders.name as folderName',
-    'note_tags.tag_id as note_tags_tag_id',
+    'notes_tags.tag_id as notes_tags_tag_id',
     'tags.id as tagId', 'tags.name as tagName')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
-    .leftJoin('note_tags', 'notes.id', 'note_tags.note_id')
-    .leftJoin('tags', 'note_tags.tag_id', 'tags.id')
+    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'notes_tags.tag_id', 'tags.id')
     .modify(function (queryBuilder) {
       if (searchTerm) { queryBuilder.where('title', 'like', `%${searchTerm}%`); }
     })
@@ -35,11 +35,11 @@ router.get('/notes/:id', (req, res, next) => {
 
   knex('notes').select('notes.id', 'title', 'content',
     'folders.id as folderId', 'folders.name as folderName',
-    'note_tags.tag_id as note_tags_tag_id',
+    'notes_tags.tag_id as notes_tags_tag_id',
     'tags.id as tagId', 'tags.name as tagName')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
-    .leftJoin('note_tags', 'notes.id', 'note_tags.note_id')
-    .leftJoin('tags', 'note_tags.tag_id', 'tags.id')
+    .leftJoin('notes_tags', 'notes.id', 'notes_tags.note_id')
+    .leftJoin('tags', 'notes_tags.tag_id', 'tags.id')
     .where('notes.id', noteId)
     .orderBy('notes.id')
     .then((results) => {
@@ -52,9 +52,8 @@ router.get('/notes/:id', (req, res, next) => {
 router.put('/notes/:id', (req, res, next) => {
   const id = req.params.id;
 
-  /***** Never trust users - validate input *****/
   const updateObj = {};
-  const updateableFields = ['title', 'content', 'folder_id, tags'];
+  const updateableFields = ['title', 'content', 'folder_id'];
 
   updateableFields.forEach(field => {
     if (field in req.body) {
@@ -62,17 +61,15 @@ router.put('/notes/:id', (req, res, next) => {
     }
   });
 
-  /***** Never trust users - validate input *****/
   if (!updateObj.title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
 
-
   knex('notes').update(updateObj).where('id', id).returning('id')
     .then(([id]) => {
-      return knex.del().from('note_tags').where('note_id', id);
+      return knex.del().from('notes_tags').where('note_id', id);
     })
     .then(([id]) => {
       // Insert related tags into notes_tags table
@@ -88,27 +85,31 @@ router.put('/notes/:id', (req, res, next) => {
 });
 
 router.post('/notes', (req, res, next) => {
-  const { title, content, folder_id, tags } = req.body;
+  const { tags } = req.body;
 
-  const newItem = { title, content, folder_id, tags };
-  /***** Never trust users - validate input *****/
-  if (!newItem.title) {
+  const newObj = {};
+  const newableFields = ['title', 'content', 'folder_id'];
+
+  newableFields.forEach(field => {
+    if (field in req.body) {
+      newObj[field] = req.body[field];
+    }
+  });
+
+  if (!newObj.title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
 
   let noteId;
-  // Insert new note into notes table
-  knex.insert(newItem).into('notes').returning('id')
+  knex.insert(newObj).into('notes').returning('id')
     .then(([id]) => {
-      // Insert related tags into notes_tags table
       noteId = id;
       const tagsInsert = tags.map(tagId => ({ note_id: noteId, tag_id: tagId }));
       return knex.insert(tagsInsert).into('notes_tags');
     })
     .then(() => {
-      // Select the new note and leftJoin on folders and tags
       return knex.select('notes.id', 'title', 'content',
         'folders.id as folder_id', 'folders.name as folderName',
         'tags.id as tagId', 'tags.name as tagName')
@@ -120,9 +121,7 @@ router.post('/notes', (req, res, next) => {
     })
     .then(result => {
       if (result) {
-        // Hydrate the results
         const hydrated = hydrateNotes(result)[0];
-        // Respond with a location header, a 201 status and a note object
         res.location(`${req.originalUrl}/${hydrated.id}`).status(201).json(hydrated);
       } else {
         next();
