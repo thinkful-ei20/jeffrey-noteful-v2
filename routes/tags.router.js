@@ -56,4 +56,19 @@ router.post('/tags', (req, res, next) => {
     });
 });
 
+router.delete('/tags/:id', (req, res, next) => {
+  const id = req.params.id;
+
+  knex
+    .del()
+    .from('tags')
+    .where('id', id)
+    .then(() => {
+      res.status(204).end();
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 module.exports = router;
