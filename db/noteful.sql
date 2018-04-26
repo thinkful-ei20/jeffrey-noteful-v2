@@ -76,3 +76,29 @@ INSERT INTO notes (title, content, folder_id) VALUES
   ('Drafts'),
   ('Personal'),
   ('Work');
+
+  DROP TABLE IF EXISTS tags CASCADE;
+
+  CREATE TABLE tags (
+    id serial PRIMARY KEY,
+    name text NOT NULL UNIQUE
+  );
+
+  ALTER SEQUENCE tags_id_seq RESTART WITH 10;
+
+  INSERT INTO tags (name) VALUES
+  ('#Archives'),
+  ('#Drafts'),
+  ('#Personal'),
+  ('#Work');
+
+  DROP TABLE IF EXISTS notes_tags CASCADE;
+
+  CREATE TABLE notes_tags (
+    note_id INTEGER NOT NULL REFERENCES notes ON DELETE CASCADE,
+    tag_id INTEGER NOT NULL REFERENCES tags ON DELETE CASCADE
+  );
+
+  INSERT INTO notes_tags (note_id, tag_id) VALUES
+  (1000, 10),
+  (1009, 13);
