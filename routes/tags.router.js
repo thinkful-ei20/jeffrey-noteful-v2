@@ -18,6 +18,21 @@ router.get('/tags', (req, res, next) => {
     });
 });
 
+router.get('/tags/:id', (req, res, next) => {
+  const id = req.params.id;
+
+  knex
+    .select('id', 'name')
+    .from('tags')
+    .where('id', id)
+    .then(([result]) => {
+      res.json(result);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 router.post('/tags', (req, res, next) => {
   const { name } = req.body;
 
