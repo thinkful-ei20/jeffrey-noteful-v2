@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS notes;
+DROP TABLE IF EXISTS notes CASCADE;
 
 CREATE TABLE notes (
   id serial PRIMARY KEY,
@@ -92,13 +92,16 @@ INSERT INTO notes (title, content, folder_id) VALUES
   ('#Personal'),
   ('#Work');
 
-  DROP TABLE IF EXISTS notes_tags CASCADE;
+  DROP TABLE IF EXISTS note_tags CASCADE;
 
-  CREATE TABLE notes_tags (
+  CREATE TABLE note_tags (
     note_id INTEGER NOT NULL REFERENCES notes ON DELETE CASCADE,
     tag_id INTEGER NOT NULL REFERENCES tags ON DELETE CASCADE
   );
 
-  INSERT INTO notes_tags (note_id, tag_id) VALUES
+  INSERT INTO note_tags (note_id, tag_id) VALUES
   (1000, 10),
-  (1009, 13);
+  (1000, 12),
+  (1005, 11),
+  (1009, 13),
+  (1009, 11);
