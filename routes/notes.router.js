@@ -44,13 +44,16 @@ router.get('/notes/:id', (req, res, next) => {
   const noteId = req.params.id;
 
   knex
-    .select('notes.id', 'title', 'content', 'folders.id as folder_id', 'folders.name as folderName')
+    .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName', 'note_tags.tag_id as note_tags_tag_id', 'tags.id as tagId', 'tags.name as tagName')
     .from('notes')
-    .innerJoin('folders', 'notes.folder_id', 'folders.id')
+    .leftJoin('folders', 'notes.folder_id', 'folders.id')
+    .leftJoin('note_tags', 'notes.id', 'note_tags.note_id')
+    .leftJoin('tags', 'note_tags.tag_id', 'tags.id')
     .where({ 'notes.id': noteId })
     .orderBy('notes.id')
-    .then(([result]) => {
-      res.json(result);
+    .then((results) => {
+      const hydrated = hydrateNotes(results);
+      res.json(hydrated[0]);
     })
     .catch(err => {
       next(err);
