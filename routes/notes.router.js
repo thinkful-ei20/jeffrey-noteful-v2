@@ -7,12 +7,14 @@ const router = express.Router();
 
 const knex = require('../knex');
 
+const { hydrateNotes } = require('../utils/hydrateNotes');
+
 // Get All (and search by query)
 router.get('/notes', (req, res, next) => {
   const { searchTerm, folderId } = req.query;
 
   knex
-    .select('notes.id', 'title', 'content', 'folders.id as folder_id', 'folders.name as folder_name', 'note_tags.tag_id as note_tags_tag_id', 'tags.id as tag_id', 'tags.name as tag_name')
+    .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName', 'note_tags.tag_id as note_tags_tag_id', 'tags.id as tagId', 'tags.name as tagName')
     .from('notes')
     .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .leftJoin('note_tags', 'notes.id', 'note_tags.note_id')
@@ -29,7 +31,8 @@ router.get('/notes', (req, res, next) => {
     })
     .orderBy('notes.id')
     .then(results => {
-      res.json(results);
+      const hydrated = hydrateNotes(results);
+      res.json(hydrated);
     })
     .catch(err => {
       next(err);
