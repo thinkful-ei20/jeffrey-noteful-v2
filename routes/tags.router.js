@@ -33,6 +33,37 @@ router.get('/tags/:id', (req, res, next) => {
     });
 });
 
+router.put('/tags/:id', (req, res, next) => {
+  const id = req.params.id;
+
+  const { name } = req.body;
+
+  if (!name) {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  const updateItem = {
+    name: name
+  };
+
+  knex('tags')
+    .update(updateItem)
+    .where('id', id)
+    .returning(['id', 'name'])
+    .then(([result]) => {
+      if (result) {
+        res.json(result);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 router.post('/tags', (req, res, next) => {
   const { name } = req.body;
 
