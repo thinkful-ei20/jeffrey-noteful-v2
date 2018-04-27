@@ -107,7 +107,7 @@ describe('Noteful App', function () {
           });
         });
     });
-    
+
     it('should return correct search results for a valid query', function () {
       let res;
       return chai.request(app).get('/api/notes?searchTerm=gaga')
@@ -141,15 +141,21 @@ describe('Noteful App', function () {
   describe('GET /api/notes/:id', function () {
 
     it('should return correct notes', function () {
-      return chai.request(app)
-        .get('/api/notes/1000')
-        .then(function (res) {
+      const dataPromise = knex.first()
+        .from('notes')
+        .where('id', 1000);
+
+      const apiPromise = chai.request(app)
+        .get('/api/notes/1000');
+
+      return Promise.all([dataPromise, apiPromise])
+        .then(function ([data, res]) {
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.an('object');
           expect(res.body).to.include.keys('id', 'title', 'content');
           expect(res.body.id).to.equal(1000);
-          expect(res.body.title).to.equal('5 life lessons learned from cats');
+          expect(res.body.title).to.equal(data.title);
         });
     });
 
