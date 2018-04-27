@@ -174,20 +174,25 @@ describe('Noteful App', function () {
     it('should create and return a new item when provided valid data', function () {
       const newItem = {
         'title': 'The best article about cats ever!',
-        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...'
+        'content': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor...',
+        'tags': []
       };
+      let body;
       return chai.request(app)
         .post('/api/notes')
         .send(newItem)
         .then(function (res) {
+          body = res.body;
           expect(res).to.have.status(201);
-          expect(res).to.be.json;
-          expect(res.body).to.be.a('object');
-          expect(res.body).to.include.keys('id', 'title', 'content');
-
-          expect(res.body.title).to.equal(newItem.title);
-          expect(res.body.content).to.equal(newItem.content);
           expect(res).to.have.header('location');
+          expect(res).to.be.json;
+          expect(body).to.be.a('object');
+          expect(body).to.include.keys('id', 'title', 'content');
+          return knex.select().from('notes').where('id', body.id);
+        })
+        .then(([data]) => {
+          expect(body.title).to.equal(data.title);
+          expect(body.content).to.equal(data.content);
         });
     });
 
