@@ -107,16 +107,21 @@ describe('Noteful App', function () {
           });
         });
     });
-
+    
     it('should return correct search results for a valid query', function () {
-      return chai.request(app)
-        .get('/api/notes?searchTerm=about%20cats')
-        .then(function (res) {
+      let res;
+      return chai.request(app).get('/api/notes?searchTerm=gaga')
+        .then(function (_res) {
+          res = _res;
           expect(res).to.have.status(200);
           expect(res).to.be.json;
           expect(res.body).to.be.a('array');
-          expect(res.body).to.have.length(4);
+          expect(res.body).to.have.length(1);
           expect(res.body[0]).to.be.an('object');
+          return knex.select().from('notes').where('title', 'like', '%gaga%');
+        })
+        .then(data => {
+          expect(res.body[0].id).to.equal(data[0].id);
         });
     });
 
